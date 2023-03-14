@@ -1,0 +1,113 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <link data-require="bootstrap@3.3.7" data-semver="3.3.7" rel="stylesheet"
+    href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+  <!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"-->
+  <!--          integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">-->
+
+  <title>Todo List on pure JavaScript</title>
+
+  <link rel="stylesheet" href="" />
+
+  <!--    <link-->
+  <!--      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker-standalone.css"-->
+  <!--    />-->
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css"
+    integrity="sha512-aEe/ZxePawj0+G2R+AaIxgrQuKT68I28qh+wgLrcAJOz3rxCP+TwrK5SPN+E5I+1IQjNtcfvb96HDagwrKRdBw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body>
+  <script data-require="jquery@3.1.1" data-semver="3.1.1"
+    src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+    crossorigin="anonymous"></script>
+
+  <!--  <script data-require="MomentJS@2.10.0" data-semver="2.10.0"-->
+  <!--    src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>-->
+  <script type="text/javascript"
+    src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.0/moment-with-locales.min.js"></script>
+
+  <!--  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/locale/ru.min.js" integrity="sha512-j5j9djiluSFyBwFHffI4b5CcyyyX02BSVBadb3ee8489Pl7Mj8uhsdbKNjeMDqaSx93iHty+rMchTZ0/3wVSBA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>-->
+  <script data-require="bootstrap@3.3.7" data-semver="3.3.7"
+    src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.0/knockout-min.js"></script>
+
+  <!--    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"-->
+  <!--        integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"-->
+  <!--        crossorigin="anonymous"></script>-->
+
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
+  <div class="form-group">
+    <div class="input-group" id="datetimepicker2">
+      <input type="text" class="form-control" />
+      <span class="input-group-addon">
+        <i class="glyphicon glyphicon-calendar"></i>
+      </span>
+    </div>
+  </div>
+  </div>
+  <ul data-bind="foreach: tasks">
+    <li>
+      <span data-bind="text: $data.title"></span>
+      <span data-bind="text: $data.date"></span>
+      <a href="#" data-bind="click: $parent.removeSelected">Remove</a>
+
+    </li>
+
+  </ul>
+  <form data-bind="submit: doSomething">
+    <input id="input" />
+    <button type="submit">добавить</button>
+  </form>
+  <div data-bind="ifnot: isvalid">Не хватает значений</div>
+  <!-- Инициализация Bootstrap DateTimePicker -->
+  <script>
+    $(function () {
+      $('#datetimepicker2').datetimepicker({
+        locale: 'ru'
+      });
+    });
+    function MyViewModel() {
+      var self = this;
+      self.isvalid = ko.observable(true)
+      self.date = moment();
+      $("#datetimepicker1").on("dp.change", function (e) {
+        self.date = e.date;
+      });
+      self.tasks = ko.observableArray(
+        JSON.parse(localStorage.getItem("tasks")) || []);
+      self.doSomething = function () {
+        if(!document.getElementById("input").value) {
+          self.isvalid(false);
+          return;
+        }
+        self.isvalid(true)
+        self.tasks.push({
+          title: document.getElementById("input").value,
+          date: self.date.format("DD.MM.YYYY")
+        })
+        console.log(self.tasks())
+        self.updateToLocalStorage();
+      };
+
+      self.removeSelected = function (right) {
+
+        self.tasks.remove(right)
+        console.log(self.tasks())
+        self.updateToLocalStorage();
+      }
+      self.updateToLocalStorage = function(){
+        localStorage.setItem("tasks", JSON.stringify(self.tasks()));
+      }
+    }
+    ko.applyBindings(new MyViewModel())
+  </script>
+</body>
+<html>
